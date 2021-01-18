@@ -7,7 +7,10 @@ class LamaBulletContact
     extends ContactCallback<LamaComponent, BulletComponent> {
   @override
   void begin(LamaComponent a, BulletComponent b, Contact contact) {
-    b.markToRemove();
+    if (!a.isDead) {
+      b.markToRemove();
+      a.killLama();
+    }
   }
 
   @override
