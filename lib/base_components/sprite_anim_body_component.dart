@@ -153,4 +153,13 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
         SpriteComponent.fromSprite(size, sheet.getSprite(row, column))
           ..anchor = anchor;
   }
+
+  void setOverridePaint(Paint paint) {
+    if (spriteComponent == null) return;
+    if (spriteComponent is SpriteComponent) {
+      (spriteComponent as SpriteComponent).overridePaint = paint;
+    } else {
+      (spriteComponent as SpriteAnimationComponent).overridePaint = paint;
+    }
+  }
 }
