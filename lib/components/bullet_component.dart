@@ -48,18 +48,17 @@ class BulletComponent extends SpriteBodyComponent {
     super.update(dt);
 
     /// Remove bullet if it contacts with lama, if called [markToRemove]
-    /// DROPS ERROR
     if (needRemove) {
       gameRef.remove(this);
       needRemove = false;
-    }
-    final pos = this.body.position;
-    body.setTransform(Vector2(pos.x + speed * dt, pos.y), 0);
+    } else {
+      final pos = this.body.position;
+      body.setTransform(Vector2(pos.x + speed * dt, pos.y), 0);
 
-    /// If the bullet go out of the screen
-    if (!rect.contains(pos.toOffset())) {
-      /// WORKS FINE
-      gameRef.remove(this);
+      /// If the bullet go out of the screen
+      if (!rect.contains(pos.toOffset())) {
+        gameRef.remove(this);
+      }
     }
   }
 
