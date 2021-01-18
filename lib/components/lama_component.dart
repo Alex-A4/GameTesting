@@ -1,10 +1,12 @@
+import 'package:flame/components/joystick/joystick_component.dart';
+import 'package:flame/components/joystick/joystick_events.dart';
 import 'package:flame/extensions/vector2.dart';
 import 'package:flame/spritesheet.dart';
 import 'package:forge2d/forge2d.dart';
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-class LamaComponent extends SpriteAnimationBodyComponent {
+class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   final Vector2 startPosition;
   bool isJumping = false;
 
@@ -40,7 +42,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
       isJumping = true;
       startAnimation(
         0,
-        Duration(milliseconds: 80),
+        Duration(milliseconds: 30),
         loop: false,
         completeCallback: () => isJumping = false,
       );
@@ -50,4 +52,18 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   void stay() {
     stopAnimation();
   }
+
+  @override
+  void joystickAction(JoystickActionEvent event) {
+    if (event.id == 1) {
+      body.setTransform(body.position + Vector2(-5, 0), 0.0);
+      jump();
+    } else if (event.id == 2) {
+      body.setTransform(body.position + Vector2(5, 0), 0.0);
+      jump();
+    }
+  }
+
+  @override
+  void joystickChangeDirectional(JoystickDirectionalEvent event) {}
 }
