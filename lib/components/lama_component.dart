@@ -1,3 +1,4 @@
+import 'package:flame/extensions/vector2.dart';
 import 'package:flame/spritesheet.dart';
 import 'package:forge2d/forge2d.dart';
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
@@ -8,15 +9,30 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   bool isJumping = false;
 
   LamaComponent(SpriteSheet sheet, this.startPosition)
-      : super.rest(sheet, Vector2.all(24));
+      : super.rest(sheet, Vector2(24, 36));
 
   @override
   Body createBody() {
+    final shape = PolygonShape();
+    final vertices = [
+      Vector2(-size.x, size.y) / 2,
+      Vector2(size.x, size.y) / 2,
+      Vector2(size.x, -size.y) / 2,
+      Vector2(-size.x, -size.y) / 2,
+    ];
+    shape.set(vertices, vertices.length);
+
+    final fix = FixtureDef()
+      ..shape = shape
+      ..restitution = 0.0
+      ..density = 1.0
+      ..friction = 0.2;
+
     final def = BodyDef()
       ..userData = this
       ..position = startPosition
-      ..type = BodyType.STATIC;
-    return world.createBody(def);
+      ..type = BodyType.DYNAMIC;
+    return world.createBody(def)..createFixture(fix);
   }
 
   void jump() {
@@ -24,7 +40,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
       isJumping = true;
       startAnimation(
         0,
-        Duration(milliseconds: 500),
+        Duration(milliseconds: 80),
         loop: false,
         completeCallback: () => isJumping = false,
       );
