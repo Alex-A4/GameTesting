@@ -10,28 +10,42 @@ import 'package:forge2d/forge2d.dart';
 class BulletComponent extends SpriteBodyComponent {
   int count = 5;
   Rect rect;
+  double speed = 150;
   final Vector2 startPosition;
 
   BulletComponent(Sprite sprite, this.startPosition)
-      : super(sprite, Vector2.all(16));
+      : super(sprite, Vector2(11, 5));
 
   @override
   Body createBody() {
+    final shape = PolygonShape();
+    final vertices = [
+      Vector2(-size.x, size.y) / 2,
+      Vector2(size.x, size.y) / 2,
+      Vector2(size.x, -size.y) / 2,
+      Vector2(-size.x, -size.y) / 2,
+    ];
+    shape.set(vertices, vertices.length);
+    final fixDef = FixtureDef()
+      ..shape = shape
+      ..restitution = 0.0
+      ..density = 0.0
+      ..friction = 0.0;
+
     final def = BodyDef()
       ..userData = this
       ..position = viewport.getScreenToWorld(startPosition)
-      ..gravityScale = 0
-      ..linearVelocity = Vector2(1000, 0)
-      ..type = BodyType.DYNAMIC;
+      ..type = BodyType.STATIC;
     final s = viewport.size / viewport.scale;
     rect = Rect.fromLTWH(-s.x / 2, -s.y / 2, s.x, s.y);
-    return world.createBody(def);
+    return world.createBody(def)..createFixture(fixDef);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
     final pos = this.body.position;
+    body.setTransform(Vector2(pos.x + speed * dt, pos.y), 0);
     if (!rect.contains(pos.toOffset())) {
       remove();
     }
