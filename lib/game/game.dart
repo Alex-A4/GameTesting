@@ -7,6 +7,7 @@ import 'package:flame/sprite.dart';
 import 'package:flame/spritesheet.dart';
 import 'package:flame_forge2d/forge2d_game.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:game_testing/components/bullet_component.dart';
 import 'package:game_testing/components/ground.dart';
 import 'package:game_testing/components/lama_component.dart';
@@ -16,18 +17,22 @@ class LamaGame extends Forge2DGame with MultiTouchDragDetector {
   JoystickComponent joystick;
   LamaComponent _lama;
 
-  LamaGame() : super(gravity: Vector2(.0, -10.0), scale: 2.0) {
+  LamaGame() : super(gravity: Vector2(.0, -50.0), scale: 2.0) {
     addContactCallback(LamaBulletContact());
     add(createJoystick());
   }
 
   JoystickComponent createJoystick() {
     joystick = JoystickComponent(actions: [
-      JoystickAction(actionId: 1, align: JoystickActionAlign.TOP_LEFT),
+      JoystickAction(
+        actionId: 1,
+        align: JoystickActionAlign.BOTTOM_LEFT,
+        margin: EdgeInsets.only(bottom: 10, left: 10),
+      ),
       JoystickAction(
         actionId: 2,
-        align: JoystickActionAlign.TOP_LEFT,
-        margin: EdgeInsets.only(left: 50),
+        align: JoystickActionAlign.BOTTOM_LEFT,
+        margin: EdgeInsets.only(left: 70, bottom: 10),
       ),
     ]);
     return joystick;
