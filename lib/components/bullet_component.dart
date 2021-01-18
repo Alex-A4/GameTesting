@@ -12,6 +12,7 @@ class BulletComponent extends SpriteBodyComponent {
   Rect rect;
   double speed = 150;
   final Vector2 startPosition;
+  bool needRemove = false;
 
   BulletComponent(Sprite sprite, this.startPosition)
       : super(sprite, Vector2(11, 5));
@@ -27,6 +28,7 @@ class BulletComponent extends SpriteBodyComponent {
     ];
     shape.set(vertices, vertices.length);
     final fixDef = FixtureDef()
+      ..userData = this
       ..shape = shape
       ..restitution = 0.0
       ..density = 0.0
@@ -44,10 +46,20 @@ class BulletComponent extends SpriteBodyComponent {
   @override
   void update(double dt) {
     super.update(dt);
+    /// DROPS ERROR
+    if (needRemove) {
+      gameRef.remove(this);
+      needRemove = false;
+    }
     final pos = this.body.position;
     body.setTransform(Vector2(pos.x + speed * dt, pos.y), 0);
     if (!rect.contains(pos.toOffset())) {
-      remove();
+      /// WORKS FINE
+      gameRef.remove(this);
     }
+  }
+
+  void markToRemove() {
+    needRemove = true;
   }
 }
