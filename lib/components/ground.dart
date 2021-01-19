@@ -7,12 +7,17 @@ import 'package:flame_forge2d/viewport.dart';
 List<Ground> createBoundaries(Viewport viewport, Sprite sprite) {
   final size = viewport.size / viewport.scale;
   final y = (-size.y / 2) + (sprite.srcSize.y / 2);
+  double totalWidth = size.x / 2;
   final list = <Ground>[];
-  for (int i = -2; i < 3; i++) {
-    list.add(
-      Ground(Vector2((i * sprite.image.width).toDouble(), y), sprite),
-    );
+  while (totalWidth >= (-size.x / 2)) {
+    list.add(Ground(Vector2(totalWidth, y), sprite));
+    totalWidth -= sprite.image.width;
   }
+  // for (int i = -2; i < 3; i++) {
+  //   list.add(
+  //     Ground(Vector2((i * sprite.image.width).toDouble(), y), sprite),
+  //   );
+  // }
 
   return list;
 }
@@ -37,7 +42,7 @@ class Ground extends SpriteBodyComponent {
     final def = FixtureDef()
       ..shape = shape
       ..restitution = 0.0
-      ..friction = 0.1;
+      ..friction = 1.0;
     final bodyDef = BodyDef()
       ..userData = this // To be able to determine object in collision
       ..position = start
