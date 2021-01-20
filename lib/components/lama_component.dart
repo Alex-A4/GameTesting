@@ -16,6 +16,11 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   bool isDead = false;
   bool applyDeadReaction = false;
 
+  /// Blink time in seconds and blink direction.
+  /// True - from fully opaque to transparent, false - otherwise
+  double blinkTime;
+  bool blinkDirection = true;
+
   final double originalHealth;
   final zero = Vector2.zero();
   double health;
@@ -79,8 +84,19 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
         body.applyLinearImpulse(Vector2(0, 30));
       }
     }
-    if (isDead && body.linearVelocity == zero) {
+
+    /// Apply dead params when lama fall down on the ground
+    if (isDead &&
+        body.linearVelocity == zero &&
+        body.getType() != BodyType.KINEMATIC) {
       body.setType(BodyType.KINEMATIC);
+      blinkTime = 3.0;
+    }
+
+    if (blinkTime != null && blinkTime > 0.0) {
+      setBlink(dt);
+    } else if (blinkTime != null && blinkTime <= 0.0) {
+      gameRef.remove(this);
     }
 
     /// Allow jump only when lama stay on ground
@@ -158,6 +174,18 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   void _killLama() {
     isDead = true;
     applyDeadReaction = true;
-    setOverridePaint(Paint()..color = Color(0x5FFFFFFF));
+  }
+
+  /// Set up sprite's blink effect
+  void setBlink(double dt) {
+    final diff = blinkTime - blinkTime.toInt();
+
+    final opacity = (blinkDirection ? diff : 1.0 - diff) * 0.5;
+    setOverridePaint(Paint()..color = Color.fromRGBO(255, 255, 255, opacity));
+    if (diff < 0.01) {
+      blinkDirection = !blinkDirection;
+      blinkTime = blinkTime.toInt().toDouble();
+    }
+    blinkTime -= dt;
   }
 }
