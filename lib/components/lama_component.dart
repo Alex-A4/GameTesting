@@ -17,6 +17,7 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   bool applyDeadReaction = false;
 
   final double originalHealth;
+  final zero = Vector2.zero();
   double health;
 
   /// Direction of jumping: 1 - right, -1 - left
@@ -78,12 +79,12 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
         body.applyLinearImpulse(Vector2(0, 30));
       }
     }
-    if (isDead && body.linearVelocity == Vector2.zero()) {
+    if (isDead && body.linearVelocity == zero) {
       body.setType(BodyType.KINEMATIC);
     }
 
     /// Allow jump only when lama stay on ground
-    if (isJumping && body.linearVelocity == Vector2.zero()) {
+    if (isJumping && body.linearVelocity == zero) {
       isJumping = false;
     }
     super.update(dt);
