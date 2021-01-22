@@ -8,7 +8,6 @@ import 'package:forge2d/forge2d.dart';
 
 /// The component of bullet
 class BulletComponent extends SpriteBodyComponent {
-  int count = 5;
   Rect rect;
   double speed = 150;
   final Vector2 startPosition;
