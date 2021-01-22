@@ -11,7 +11,7 @@ List<Ground> createBoundaries(Viewport viewport, Sprite sprite) {
   final list = <Ground>[];
   while (totalWidth >= (-size.x / 2)) {
     list.add(Ground(Vector2(totalWidth, y), sprite));
-    totalWidth -= (sprite.image.width * viewport.scale);
+    totalWidth -= (sprite.image.width);
   }
 
   return list;
