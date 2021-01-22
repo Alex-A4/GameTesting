@@ -1,15 +1,13 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:flame/components/joystick/joystick_component.dart';
-import 'package:flame/components/joystick/joystick_events.dart';
 import 'package:flame/extensions/vector2.dart';
 import 'package:flame/spritesheet.dart';
 import 'package:forge2d/forge2d.dart';
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
+class LamaComponent extends SpriteAnimationBodyComponent {
   final Vector2 startPosition;
   bool isJumping = false;
 
@@ -26,7 +24,7 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   double health;
 
   /// Direction of jumping: 1 - right, -1 - left
-  int jumpDirection = 1;
+  int jumpDirection = -1;
 
   LamaComponent(
     SpriteSheet sheet,
@@ -39,9 +37,9 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   /// Creates a edge shape (left or right side) depends on direction.
   /// This helps with avoiding contacts between bullet and lama when it's dead.
   Shape get deadShape {
-    final left = Vector2(-size.x * (-jumpDirection), size.y) / 2;
-    final right = Vector2(-size.x * (-jumpDirection), -size.y) / 2;
-    return EdgeShape()..set(left, right);
+    final top = Vector2(-size.x * (-jumpDirection), size.y) / 2;
+    final down = Vector2(-size.x * (-jumpDirection), size.y - 5) / 2;
+    return EdgeShape()..set(top, down);
   }
 
   @override
@@ -103,6 +101,8 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
     if (isJumping && body.linearVelocity == zero) {
       isJumping = false;
     }
+    if (!isJumping) jump();
+
     super.update(dt);
   }
 
@@ -133,6 +133,7 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
     if (isDead) return;
     if (!isJumping) {
       isJumping = true;
+      body.applyLinearImpulse(Vector2(10.0 * jumpDirection, 8));
       startAnimation(
         jumpDirection == 1 ? 0 : 1,
         Duration(milliseconds: 70),
@@ -144,24 +145,6 @@ class LamaComponent extends SpriteAnimationBodyComponent with JoystickListener {
   void stay() {
     stopAnimation(jumpDirection == 1 ? 0 : 1, 0);
   }
-
-  @override
-  void joystickAction(JoystickActionEvent event) {
-    if (isJumping || isDead) return;
-    if (event.id == 1) {
-      jumpDirection = -1;
-      jump();
-    } else if (event.id == 2) {
-      jumpDirection = 1;
-      jump();
-    }
-    if (event.id == 1 || event.id == 2) {
-      body.applyLinearImpulse(Vector2(10.0 * jumpDirection, 8));
-    }
-  }
-
-  @override
-  void joystickChangeDirectional(JoystickDirectionalEvent event) {}
 
   void damageLama(double damage) {
     health -= damage;
