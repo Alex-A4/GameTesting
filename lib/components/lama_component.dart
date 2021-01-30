@@ -20,7 +20,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   bool blinkDirection = true;
 
   final double originalHealth;
-  final zero = Vector2.zero();
+  static final zero = Vector2.zero();
   double health;
 
   /// Direction of jumping: 1 - right, -1 - left
@@ -58,6 +58,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
       ..restitution = 0.0
       ..density = 0.0
       ..friction = 1.0;
+    fix.filter.groupIndex = -1;
 
     final def = BodyDef()
       ..userData = this
