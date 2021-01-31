@@ -38,6 +38,7 @@ class Ground extends SpriteBodyComponent {
       ..shape = shape
       ..restitution = 0.0
       ..friction = 1.0;
+    def.filter.groupIndex = -2;
     final bodyDef = BodyDef()
       ..userData = this // To be able to determine object in collision
       ..position = start
