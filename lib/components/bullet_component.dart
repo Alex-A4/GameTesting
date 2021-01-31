@@ -9,12 +9,23 @@ import 'package:forge2d/forge2d.dart';
 /// The component of bullet
 class BulletComponent extends SpriteBodyComponent {
   Rect rect;
-  double speed = 150;
-  final Vector2 startPosition;
+  double speed;
+  double damage;
+  double startY;
+  double mass;
   bool needRemove = false;
 
-  BulletComponent(Sprite sprite, this.startPosition)
-      : super(sprite, Vector2(11, 5));
+  BulletComponent(
+    Sprite sprite,
+    this.startY, {
+    this.speed,
+    this.damage,
+    this.mass,
+  }) : super(sprite, Vector2(11, 5)) {
+    this.speed ??= 150;
+    this.damage ??= 10;
+    this.mass ??= 0.1;
+  }
 
   @override
   Body createBody() {
@@ -29,17 +40,21 @@ class BulletComponent extends SpriteBodyComponent {
     final fixDef = FixtureDef()
       ..userData = this
       ..shape = shape
-      ..restitution = 0.0
+      ..restitution = 1.0
       ..density = 0.0
       ..friction = 0.0;
+    fixDef.filter.groupIndex = -2;
 
     final def = BodyDef()
       ..userData = this
-      ..position = viewport.getScreenToWorld(startPosition)
-      ..type = BodyType.STATIC;
+      ..position = viewport.getScreenToWorld(Vector2(0, startY))
+      ..type = BodyType.DYNAMIC;
+    this.startY = def.position.y;
     final s = viewport.size / viewport.scale;
     rect = Rect.fromLTWH(-s.x / 2, -s.y / 2, s.x, s.y);
-    return world.createBody(def)..createFixture(fixDef);
+    return world.createBody(def)
+      ..createFixture(fixDef)
+      ..setMassData(MassData()..mass = mass);
   }
 
   @override
@@ -52,7 +67,7 @@ class BulletComponent extends SpriteBodyComponent {
       needRemove = false;
     } else {
       final pos = this.body.position;
-      body.setTransform(Vector2(pos.x + speed * dt, pos.y), 0);
+      body.setTransform(Vector2(pos.x + speed * dt, startY), 0);
 
       /// If the bullet go out of the screen
       if (!rect.contains(pos.toOffset())) {
