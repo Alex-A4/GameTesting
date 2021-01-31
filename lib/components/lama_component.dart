@@ -9,6 +9,7 @@ import 'package:vector_math/vector_math_64.dart';
 
 class LamaComponent extends SpriteAnimationBodyComponent {
   final Vector2 startPosition;
+  double jumpPower;
   bool isJumping = false;
 
   bool isDead = false;
@@ -30,16 +31,10 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     SpriteSheet sheet,
     this.startPosition, {
     this.originalHealth = 100.0,
+    this.jumpPower,
   }) : super.rest(sheet, Vector2(24, 36)) {
     this.health = originalHealth;
-  }
-
-  /// Creates a edge shape (left or right side) depends on direction.
-  /// This helps with avoiding contacts between bullet and lama when it's dead.
-  Shape get deadShape {
-    final top = Vector2(-size.x * (-jumpDirection), size.y) / 2;
-    final down = Vector2(-size.x * (-jumpDirection), size.y - 5) / 2;
-    return EdgeShape()..set(top, down);
+    this.jumpPower ??= 1;
   }
 
   @override
@@ -54,6 +49,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     shape.set(vertices, vertices.length);
 
     final fix = FixtureDef()
+      ..userData = this
       ..shape = shape
       ..restitution = 0.0
       ..density = 0.0
@@ -78,18 +74,10 @@ class LamaComponent extends SpriteAnimationBodyComponent {
         while (body.fixtures.isNotEmpty) {
           body.destroyFixture(body.fixtures.first);
         }
-        body.createFixture(FixtureDef()..shape = deadShape);
         body.setTransform(body.position, -1 * jumpDirection * math.pi / 2);
-        body.applyLinearImpulse(Vector2(0, 30));
+        body.setType(BodyType.KINEMATIC);
+        blinkTime = 3.0;
       }
-    }
-
-    /// Apply dead params when lama fall down on the ground
-    if (isDead &&
-        body.linearVelocity == zero &&
-        body.getType() != BodyType.KINEMATIC) {
-      body.setType(BodyType.KINEMATIC);
-      blinkTime = 3.0;
     }
 
     if (blinkTime != null && blinkTime > 0.0) {
@@ -134,7 +122,8 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     if (isDead) return;
     if (!isJumping) {
       isJumping = true;
-      body.applyLinearImpulse(Vector2(10.0 * jumpDirection, 8));
+      body.applyLinearImpulse(
+          Vector2(10.0 * jumpDirection * jumpPower, 8 * jumpPower));
       startAnimation(
         jumpDirection == 1 ? 0 : 1,
         Duration(milliseconds: 70),
