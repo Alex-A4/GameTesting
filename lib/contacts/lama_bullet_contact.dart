@@ -9,7 +9,7 @@ class LamaBulletContact
   void begin(LamaComponent a, BulletComponent b, Contact contact) {
     if (!a.isDead) {
       b.markToRemove();
-      a.damageLama(10.0);
+      a.damageLama(b.damage);
     }
   }
 
