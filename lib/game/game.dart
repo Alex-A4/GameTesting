@@ -1,5 +1,4 @@
 import 'package:flame/extensions/vector2.dart';
-import 'package:flame/extensions/offset.dart';
 import 'package:flame/gestures.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame/spritesheet.dart';
@@ -21,7 +20,7 @@ class LamaGame extends Forge2DGame with PanDetector {
   Timer bulletCooldown;
 
   LamaGame({
-    this.spamSpeed = const Duration(milliseconds: 5000),
+    this.spamSpeed = const Duration(milliseconds: 1000),
     this.bulletSpam = const Duration(milliseconds: 100),
   }) : super(gravity: Vector2(.0, -50.0), scale: 2.0) {
     addContactCallback(LamaBulletContact());
@@ -50,6 +49,7 @@ class LamaGame extends Forge2DGame with PanDetector {
                 srcSize: Vector2(24, 36),
               ),
               Vector2(size.x / 2 - 20, y),
+              jumpPower: totalLamaCount > maxLamaCount ~/ 2 ? 2 : 1,
             ),
           );
         }
@@ -75,7 +75,8 @@ class LamaGame extends Forge2DGame with PanDetector {
     if (!bulletCooldown.isRunning()) {
       final bullet = BulletComponent(
         Sprite(images.fromCache('bullet.png')),
-        details.localPosition.toVector2(),
+        details.localPosition.dy,
+        damage: 3,
       );
       add(bullet);
       bulletCooldown.start();
