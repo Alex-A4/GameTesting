@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:game_testing/components/bullet_component.dart';
 import 'package:game_testing/components/ground.dart';
 import 'package:game_testing/components/lama_component.dart';
+import 'package:game_testing/components/tower_health_component.dart';
 import 'package:game_testing/contacts/lama_bullet_contact.dart';
 
 class LamaGame extends Forge2DGame with PanDetector {
@@ -19,6 +20,8 @@ class LamaGame extends Forge2DGame with PanDetector {
   /// Timers that displays lama and bullet cooldown
   Timer lamaCooldown;
   Timer bulletCooldown;
+
+  TowerHealthComponent towerHealth;
 
   LamaGame({
     this.lamaSpam = const Duration(milliseconds: 1000),
@@ -37,6 +40,10 @@ class LamaGame extends Forge2DGame with PanDetector {
       viewport,
       Sprite(images.fromCache('ground.png'), srcSize: Vector2(32, 8)),
     ));
+    towerHealth = TowerHealthComponent(
+        100, Vector2(5, 10), viewport.width);
+    add(towerHealth);
+
     lamaCooldown = Timer(
       lamaSpam.inMilliseconds / Duration.millisecondsPerSecond,
       callback: () {
@@ -62,6 +69,8 @@ class LamaGame extends Forge2DGame with PanDetector {
         Timer(bulletSpam.inMilliseconds / Duration.millisecondsPerSecond);
     lamaCooldown.start();
   }
+
+  void damageTower(double damage) => towerHealth.damageTower(damage);
 
   @override
   void update(double dt) {
