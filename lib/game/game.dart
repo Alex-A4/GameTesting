@@ -12,16 +12,19 @@ import 'package:game_testing/components/lama_component.dart';
 import 'package:game_testing/contacts/lama_bullet_contact.dart';
 
 class LamaGame extends Forge2DGame with PanDetector {
-  final Duration spamSpeed;
+  final Duration lamaSpam;
   final Duration bulletSpam;
-  static const maxLamaCount = 5;
+  final int maxLamaCount;
   int totalLamaCount = 0;
-  Timer spamTimer;
+
+  /// Timers that displays lama and bullet cooldown
+  Timer lamaCooldown;
   Timer bulletCooldown;
 
   LamaGame({
-    this.spamSpeed = const Duration(milliseconds: 1000),
+    this.lamaSpam = const Duration(milliseconds: 1000),
     this.bulletSpam = const Duration(milliseconds: 100),
+    this.maxLamaCount = 5,
   }) : super(gravity: Vector2(.0, -50.0), scale: 2.0) {
     addContactCallback(LamaBulletContact());
   }
@@ -35,8 +38,8 @@ class LamaGame extends Forge2DGame with PanDetector {
       viewport,
       Sprite(images.fromCache('ground.png'), srcSize: Vector2(32, 8)),
     ));
-    spamTimer = Timer(
-      spamSpeed.inMilliseconds / Duration.millisecondsPerSecond,
+    lamaCooldown = Timer(
+      lamaSpam.inMilliseconds / Duration.millisecondsPerSecond,
       callback: () {
         if (totalLamaCount < maxLamaCount) {
           final size = viewport.size / viewport.scale;
@@ -58,13 +61,13 @@ class LamaGame extends Forge2DGame with PanDetector {
     );
     bulletCooldown =
         Timer(bulletSpam.inMilliseconds / Duration.millisecondsPerSecond);
-    spamTimer.start();
+    lamaCooldown.start();
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    spamTimer.update(dt);
+    lamaCooldown.update(dt);
     if (bulletCooldown.isRunning()) {
       bulletCooldown.update(dt);
     }
