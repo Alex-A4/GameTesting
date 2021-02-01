@@ -4,8 +4,7 @@ import 'package:flame/sprite.dart';
 import 'package:flame/spritesheet.dart';
 import 'package:flame/timer.dart';
 import 'package:flame_forge2d/forge2d_game.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:game_testing/components/bullet_component.dart';
 import 'package:game_testing/components/ground.dart';
 import 'package:game_testing/components/lama_component.dart';
@@ -75,10 +74,19 @@ class LamaGame extends Forge2DGame with PanDetector {
 
   @override
   void onPanUpdate(DragUpdateDetails details) {
+    spamBullet(details.localPosition);
+  }
+
+  @override
+  void onPanStart(DragStartDetails details) {
+    spamBullet(details.localPosition);
+  }
+
+  void spamBullet(Offset position) {
     if (!bulletCooldown.isRunning()) {
       final bullet = BulletComponent(
         Sprite(images.fromCache('bullet.png')),
-        details.localPosition.dy,
+        position.dy,
         damage: 3,
       );
       add(bullet);
