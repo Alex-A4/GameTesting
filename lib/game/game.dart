@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:game_testing/components/bullet_component.dart';
 import 'package:game_testing/components/ground.dart';
 import 'package:game_testing/components/lama_component.dart';
+import 'package:game_testing/components/tower_component.dart';
 import 'package:game_testing/components/tower_health_component.dart';
 import 'package:game_testing/contacts/lama_bullet_contact.dart';
 
@@ -23,6 +24,8 @@ class LamaGame extends Forge2DGame with PanDetector {
 
   TowerHealthComponent towerHealth;
 
+  double groundY;
+
   LamaGame({
     this.lamaSpam = const Duration(milliseconds: 1000),
     this.bulletSpam = const Duration(milliseconds: 100),
@@ -36,20 +39,26 @@ class LamaGame extends Forge2DGame with PanDetector {
     await images.load('lama.png');
     await images.load('bullet.png');
     await images.load('ground.png');
+    await images.load('tower.png');
     addAll(createBoundaries(
       viewport,
       Sprite(images.fromCache('ground.png'), srcSize: Vector2(32, 8)),
     ));
-    towerHealth = TowerHealthComponent(
-        100, Vector2(5, 10), viewport.width);
+    towerHealth = TowerHealthComponent(100, Vector2(5, 10), viewport.width);
     add(towerHealth);
+
+    final size = viewport.size / viewport.scale;
+    groundY = (-size.y / 2) + 20;
+    add(TowerComponent(
+      Sprite(images.fromCache('ground.png'), srcSize: Vector2(0, 0)),
+      Vector2(-size.x / 2 + 20, groundY),
+    ));
 
     lamaCooldown = Timer(
       lamaSpam.inMilliseconds / Duration.millisecondsPerSecond,
       callback: () {
         if (totalLamaCount < maxLamaCount) {
           final size = viewport.size / viewport.scale;
-          final y = (-size.y / 2) + 20;
           totalLamaCount++;
           add(
             LamaComponent(
@@ -57,7 +66,7 @@ class LamaGame extends Forge2DGame with PanDetector {
                 image: images.fromCache('lama.png'),
                 srcSize: Vector2(24, 36),
               ),
-              Vector2(size.x / 2 - 20, y),
+              Vector2(size.x / 2 - 20, groundY),
               jumpPower: totalLamaCount > maxLamaCount ~/ 2 ? 2 : 1,
             ),
           );
