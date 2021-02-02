@@ -1,7 +1,6 @@
 import 'package:flame/spritesheet.dart';
 import 'package:forge2d/forge2d.dart';
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
-import 'package:game_testing/game/game.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 /// Component that describe tower which will be attacked by lamas
@@ -27,6 +26,7 @@ class TowerComponent extends SpriteAnimationBodyComponent {
       ..userData = this
       ..friction = 0.0
       ..shape = shape;
+    fixtureDef.filter.groupIndex = -2;
 
     final bodyDef = BodyDef()
       ..userData = this
@@ -35,9 +35,6 @@ class TowerComponent extends SpriteAnimationBodyComponent {
 
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
-
-  /// Attack tower to reduce health by [damage]
-  void damageTower(double damage) => (gameRef as LamaGame).damageTower(damage);
 
   /// Animate shooting
   void shoot() {
