@@ -3,12 +3,18 @@ import 'dart:ui';
 
 import 'package:flame/extensions/vector2.dart';
 import 'package:flame/spritesheet.dart';
-import 'package:forge2d/forge2d.dart';
+import 'package:flame/timer.dart';
+import 'package:forge2d/forge2d.dart' hide Timer;
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class LamaComponent extends SpriteAnimationBodyComponent {
   final Vector2 startPosition;
+  final double damage;
+  final Duration attackCooldown;
+
+  Timer attackTimer;
+
   double jumpPower;
   bool isJumping = false;
 
@@ -30,11 +36,16 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   LamaComponent(
     SpriteSheet sheet,
     this.startPosition, {
+    this.attackCooldown = const Duration(milliseconds: 300),
     this.originalHealth = 100.0,
+    this.damage = 5.0,
     this.jumpPower,
   }) : super.rest(sheet, Vector2(24, 36)) {
     this.health = originalHealth;
     this.jumpPower ??= 1;
+    attackTimer = Timer(
+      attackCooldown.inMilliseconds / Duration.millisecondsPerSecond,
+    );
   }
 
   @override
@@ -67,6 +78,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
 
   @override
   void update(double dt) {
+    if (attackTimer.isRunning()) attackTimer.update(dt);
     if (isDead) {
       isJumping = false;
       if (applyDeadReaction) {
@@ -160,5 +172,14 @@ class LamaComponent extends SpriteAnimationBodyComponent {
       blinkTime = blinkTime.toInt().toDouble();
     }
     blinkTime -= dt;
+  }
+
+  /// Is the lama can attack
+  bool canAttack() => !attackTimer.isRunning();
+
+  /// Make attack and run attack cooldown
+  void makeAttack() {
+    assert(canAttack());
+    attackTimer.start();
   }
 }
