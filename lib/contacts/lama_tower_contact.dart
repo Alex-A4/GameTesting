@@ -6,10 +6,7 @@ import 'package:game_testing/components/tower_component.dart';
 class LamaTowerContact extends ContactCallback<LamaComponent, TowerComponent> {
   @override
   void begin(LamaComponent a, TowerComponent b, Contact contact) {
-    if (a.canAttack()) {
-      b.damageTower(a.damage);
-      a.makeAttack();
-    }
+    a.startAttacking();
   }
 
   @override
