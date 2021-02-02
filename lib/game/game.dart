@@ -23,6 +23,7 @@ class LamaGame extends Forge2DGame with PanDetector {
   Timer bulletCooldown;
 
   TowerHealthComponent towerHealth;
+  TowerComponent towerComponent;
 
   double groundY;
 
@@ -49,10 +50,14 @@ class LamaGame extends Forge2DGame with PanDetector {
 
     final size = viewport.size / viewport.scale;
     groundY = (-size.y / 2) + 20;
-    add(TowerComponent(
-      Sprite(images.fromCache('ground.png'), srcSize: Vector2(0, 0)),
+    towerComponent = TowerComponent(
+      SpriteSheet(
+        image: images.fromCache('tower.png'),
+        srcSize: Vector2(32, 32),
+      ),
       Vector2(-size.x / 2 + 20, groundY),
-    ));
+    );
+    add(towerComponent);
 
     lamaCooldown = Timer(
       lamaSpam.inMilliseconds / Duration.millisecondsPerSecond,
@@ -107,6 +112,7 @@ class LamaGame extends Forge2DGame with PanDetector {
         position.dy,
         damage: 3,
       );
+      towerComponent.shoot();
       add(bullet);
       bulletCooldown.start();
     }
