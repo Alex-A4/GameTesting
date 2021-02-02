@@ -11,6 +11,7 @@ import 'package:game_testing/components/lama_component.dart';
 import 'package:game_testing/components/tower_component.dart';
 import 'package:game_testing/components/tower_health_component.dart';
 import 'package:game_testing/contacts/lama_bullet_contact.dart';
+import 'package:game_testing/contacts/lama_tower_contact.dart';
 
 class LamaGame extends Forge2DGame with PanDetector {
   final Duration lamaSpam;
@@ -33,6 +34,7 @@ class LamaGame extends Forge2DGame with PanDetector {
     this.maxLamaCount = 5,
   }) : super(gravity: Vector2(.0, -50.0), scale: 2.0) {
     addContactCallback(LamaBulletContact());
+    addContactCallback(LamaTowerContact());
   }
 
   @override
@@ -55,7 +57,7 @@ class LamaGame extends Forge2DGame with PanDetector {
         image: images.fromCache('tower.png'),
         srcSize: Vector2(32, 32),
       ),
-      Vector2(-size.x / 2 + 20, groundY),
+      Vector2(-size.x / 2 + 16, groundY + 4),
     );
     add(towerComponent);
 
