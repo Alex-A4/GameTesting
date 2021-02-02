@@ -47,7 +47,7 @@ class BulletComponent extends SpriteBodyComponent {
 
     final def = BodyDef()
       ..userData = this
-      ..position = viewport.getScreenToWorld(Vector2(0, startY))
+      ..position = viewport.getScreenToWorld(Vector2(40, startY))
       ..type = BodyType.DYNAMIC;
     this.startY = def.position.y;
     final s = viewport.size / viewport.scale;
