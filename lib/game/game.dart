@@ -12,6 +12,8 @@ import 'package:game_testing/components/tower_component.dart';
 import 'package:game_testing/components/tower_health_component.dart';
 import 'package:game_testing/contacts/lama_bullet_contact.dart';
 import 'package:game_testing/contacts/lama_tower_contact.dart';
+import 'package:game_testing/models/bullet_model.dart';
+import 'package:game_testing/models/lama_model.dart';
 
 class LamaGame extends Forge2DGame with PanDetector {
   final Duration lamaSpam;
@@ -68,12 +70,14 @@ class LamaGame extends Forge2DGame with PanDetector {
           final size = viewport.size / viewport.scale;
           totalLamaCount++;
           if (totalLamaCount > maxLamaCount ~/ 2) {
-            add(BigLamaComponent(
+            add(LamaComponent(
               SpriteSheet(
                 image: images.fromCache('lama.png'),
                 srcSize: Vector2(24, 36),
               ),
               Vector2(size.x / 2 - 20, groundY),
+              lama: Lama(10, Duration(seconds: 2), 200, 2),
+              sheetSize: Vector2(36, 54),
             ));
           } else
             add(
@@ -120,7 +124,7 @@ class LamaGame extends Forge2DGame with PanDetector {
       final bullet = BulletComponent(
         Sprite(images.fromCache('bullet.png')),
         position.dy,
-        damage: 3,
+        bullet: Bullet.simple(),
       );
       towerComponent.shoot();
       add(bullet);

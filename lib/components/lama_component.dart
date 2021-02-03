@@ -7,16 +7,15 @@ import 'package:flame/timer.dart';
 import 'package:forge2d/forge2d.dart' hide Timer;
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
 import 'package:game_testing/game/game.dart';
+import 'package:game_testing/models/lama_model.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class LamaComponent extends SpriteAnimationBodyComponent {
   final Vector2 startPosition;
-  final double damage;
-  final Duration attackCooldown;
+  final Lama lama;
 
   Timer attackTimer;
 
-  double jumpPower;
   bool isJumping = false;
 
   bool isDead = false;
@@ -27,7 +26,6 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   double blinkTime;
   bool blinkDirection = true;
 
-  final double originalHealth;
   static final zero = Vector2.zero();
   double health;
 
@@ -37,16 +35,12 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   LamaComponent(
     SpriteSheet sheet,
     this.startPosition, {
-    this.attackCooldown = const Duration(milliseconds: 1000),
-    this.originalHealth = 100.0,
-    this.damage = 5.0,
-    this.jumpPower,
+    Lama lama,
     Vector2 sheetSize,
-  }) : super.rest(sheet, sheetSize ?? Vector2(24, 36)) {
-    this.health = originalHealth;
-    this.jumpPower ??= 1;
+  })  : this.lama = lama ?? Lama.simple(),
+        super.rest(sheet, sheetSize ?? Vector2(24, 36)) {
     attackTimer = Timer(
-      attackCooldown.inMilliseconds / Duration.millisecondsPerSecond,
+      lama.attackCooldown.inMilliseconds / Duration.millisecondsPerSecond,
       repeat: true,
       callback: () => _implementAttack(),
     );
@@ -128,7 +122,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
       ..color = Color(0xFF9F9F9F)
       ..strokeWidth = 2;
 
-    final part = health / originalHealth;
+    final part = health / lama.health;
     final partPoint = Vector2(origSize.x * part, 0) + padding;
 
     c.drawLine(padding.toOffset(), partPoint.toOffset(), healthPaint);
@@ -141,7 +135,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     if (!isJumping) {
       isJumping = true;
       body.applyLinearImpulse(
-          Vector2(10.0 * jumpDirection * jumpPower, 8 * jumpPower));
+          Vector2(10.0 * jumpDirection * lama.jumpPower, 8 * lama.jumpPower));
       startAnimation(
         jumpDirection == 1 ? 0 : 1,
         Duration(milliseconds: 70),
@@ -181,24 +175,11 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   }
 
   void _implementAttack() {
-    (gameRef as LamaGame).damageTower(damage);
+    (gameRef as LamaGame).damageTower(lama.damage);
   }
 
   /// Start attacking tower by cooldown
   void startAttacking() => attackTimer.start();
 
   void stopAttacking() => attackTimer.stop();
-}
-
-class BigLamaComponent extends LamaComponent {
-  BigLamaComponent(SpriteSheet sheet, Vector2 startPosition)
-      : super(
-          sheet,
-          startPosition,
-          jumpPower: 2,
-          damage: 10,
-          attackCooldown: Duration(seconds: 2),
-          originalHealth: 200,
-          sheetSize: Vector2(36, 54),
-        );
 }
