@@ -156,6 +156,10 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     }
   }
 
+  void kickBody(Vector2 kickImpulse) {
+
+  }
+
   void _killLama() {
     isDead = true;
     applyDeadReaction = true;

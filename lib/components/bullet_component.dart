@@ -70,8 +70,4 @@ class BulletComponent extends SpriteBodyComponent {
   void markToRemove() {
     needRemove = true;
   }
-
-  void kickBody(Body enemyBody) {
-    enemyBody.applyLinearImpulse(bullet.kickBody);
-  }
 }
