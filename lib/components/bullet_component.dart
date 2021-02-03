@@ -5,27 +5,18 @@ import 'package:flame/extensions/vector2.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_forge2d/sprite_body_component.dart';
 import 'package:forge2d/forge2d.dart';
+import 'package:game_testing/models/bullet_model.dart';
 
 /// The component of bullet
 class BulletComponent extends SpriteBodyComponent {
+  final Bullet bullet;
   Rect rect;
-  double speed;
-  double damage;
   double startY;
-  double mass;
   bool needRemove = false;
 
-  BulletComponent(
-    Sprite sprite,
-    this.startY, {
-    this.speed,
-    this.damage,
-    this.mass,
-  }) : super(sprite, Vector2(11, 5)) {
-    this.speed ??= 150;
-    this.damage ??= 10;
-    this.mass ??= 0.1;
-  }
+  BulletComponent(Sprite sprite, this.startY, {Bullet bullet})
+      : this.bullet = bullet ?? Bullet.simple(),
+        super(sprite, Vector2(11, 5));
 
   @override
   Body createBody() {
@@ -54,7 +45,7 @@ class BulletComponent extends SpriteBodyComponent {
     rect = Rect.fromLTWH(-s.x / 2, -s.y / 2, s.x, s.y);
     return world.createBody(def)
       ..createFixture(fixDef)
-      ..setMassData(MassData()..mass = mass);
+      ..setMassData(MassData()..mass = 0.01);
   }
 
   @override
@@ -67,7 +58,7 @@ class BulletComponent extends SpriteBodyComponent {
       needRemove = false;
     } else {
       final pos = this.body.position;
-      body.setTransform(Vector2(pos.x + speed * dt, startY), 0);
+      body.setTransform(Vector2(pos.x + bullet.speed * dt, startY), 0);
 
       /// If the bullet go out of the screen
       if (!rect.contains(pos.toOffset())) {
@@ -78,5 +69,9 @@ class BulletComponent extends SpriteBodyComponent {
 
   void markToRemove() {
     needRemove = true;
+  }
+
+  void kickBody(Body enemyBody) {
+    enemyBody.applyLinearImpulse(bullet.kickBody);
   }
 }
