@@ -10,5 +10,7 @@ class LamaTowerContact extends ContactCallback<LamaComponent, TowerComponent> {
   }
 
   @override
-  void end(LamaComponent a, TowerComponent b, Contact contact) {}
+  void end(LamaComponent a, TowerComponent b, Contact contact) {
+    a.stopAttacking();
+  }
 }
