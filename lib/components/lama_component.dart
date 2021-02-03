@@ -41,7 +41,8 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     this.originalHealth = 100.0,
     this.damage = 5.0,
     this.jumpPower,
-  }) : super.rest(sheet, Vector2(24, 36)) {
+    Vector2 sheetSize,
+  }) : super.rest(sheet, sheetSize ?? Vector2(24, 36)) {
     this.health = originalHealth;
     this.jumpPower ??= 1;
     attackTimer = Timer(
@@ -185,4 +186,19 @@ class LamaComponent extends SpriteAnimationBodyComponent {
 
   /// Start attacking tower by cooldown
   void startAttacking() => attackTimer.start();
+
+  void stopAttacking() => attackTimer.stop();
+}
+
+class BigLamaComponent extends LamaComponent {
+  BigLamaComponent(SpriteSheet sheet, Vector2 startPosition)
+      : super(
+          sheet,
+          startPosition,
+          jumpPower: 2,
+          damage: 10,
+          attackCooldown: Duration(seconds: 2),
+          originalHealth: 200,
+          sheetSize: Vector2(36, 54),
+        );
 }
