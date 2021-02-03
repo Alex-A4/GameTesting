@@ -67,16 +67,24 @@ class LamaGame extends Forge2DGame with PanDetector {
         if (totalLamaCount < maxLamaCount) {
           final size = viewport.size / viewport.scale;
           totalLamaCount++;
-          add(
-            LamaComponent(
+          if (totalLamaCount > maxLamaCount ~/ 2) {
+            add(BigLamaComponent(
               SpriteSheet(
                 image: images.fromCache('lama.png'),
                 srcSize: Vector2(24, 36),
               ),
               Vector2(size.x / 2 - 20, groundY),
-              jumpPower: totalLamaCount > maxLamaCount ~/ 2 ? 2 : 1,
-            ),
-          );
+            ));
+          } else
+            add(
+              LamaComponent(
+                SpriteSheet(
+                  image: images.fromCache('lama.png'),
+                  srcSize: Vector2(24, 36),
+                ),
+                Vector2(size.x / 2 - 20, groundY),
+              ),
+            );
         }
       },
       repeat: true,
