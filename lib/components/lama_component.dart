@@ -40,10 +40,11 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   })  : this.lama = lama ?? Lama.simple(),
         super.rest(sheet, sheetSize ?? Vector2(24, 36)) {
     attackTimer = Timer(
-      lama.attackCooldown.inMilliseconds / Duration.millisecondsPerSecond,
+      this.lama.attackCooldown.inMilliseconds / Duration.millisecondsPerSecond,
       repeat: true,
       callback: () => _implementAttack(),
     );
+    health = this.lama.health;
   }
 
   @override
