@@ -130,6 +130,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
         Vector2(origSize.x + padding.x, 0).toOffset(), lessHealthPaint);
   }
 
+  /// Implement jump animation
   void jump() {
     if (isDead) return;
     if (!isJumping) {
@@ -144,10 +145,12 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     }
   }
 
+  /// Set up default sprite to display staying
   void stay() {
     stopAnimation(jumpDirection == 1 ? 0 : 1, 0);
   }
 
+  /// Damage lama's health
   void damageLama(double damage) {
     health -= damage;
     if (health <= 0.0) {
@@ -156,10 +159,12 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     }
   }
 
+  /// Kick the body to apply impulse
   void kickBody(Vector2 kickImpulse) {
-
+    body.applyLinearImpulse(kickImpulse);
   }
 
+  /// Kill lama when [health]=0.0 and apply dead reaction
   void _killLama() {
     isDead = true;
     applyDeadReaction = true;
@@ -178,6 +183,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     blinkTime -= dt;
   }
 
+  /// Implement attack to damage tower
   void _implementAttack() {
     (gameRef as LamaGame).damageTower(lama.damage);
   }
@@ -185,5 +191,6 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   /// Start attacking tower by cooldown
   void startAttacking() => attackTimer.start();
 
+  /// Stop attacking tower by cooldown
   void stopAttacking() => attackTimer.stop();
 }
