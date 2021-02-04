@@ -28,6 +28,8 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   @override
   bool debugMode = false;
 
+  Paint overridePaint;
+
   /// Make sure that the [size] of the sprite matches the bounding shape of the
   /// body that is create in createBody().
   ///
@@ -141,7 +143,8 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
 
     spriteComponent =
         SpriteAnimationComponent(size, a, removeOnFinish: removeOnFinish)
-          ..anchor = anchor;
+          ..anchor = anchor
+          ..overridePaint = overridePaint;
   }
 
   /// Stop animation with removing old component and set up simple sprite that
@@ -151,10 +154,12 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     spriteComponent?.remove();
     spriteComponent =
         SpriteComponent.fromSprite(size, sheet.getSprite(row, column))
-          ..anchor = anchor;
+          ..anchor = anchor
+          ..overridePaint = overridePaint;
   }
 
   void setOverridePaint(Paint paint) {
+    this.overridePaint = paint;
     if (spriteComponent == null) return;
     if (spriteComponent is SpriteComponent) {
       (spriteComponent as SpriteComponent).overridePaint = paint;
