@@ -9,7 +9,8 @@ class LamaBulletContact
   @override
   void begin(LamaComponent a, BulletComponent b, Contact contact) {
     if (!a.isDead) {
-      b.markToRemove();
+      b.markToRemove
+        ();
       a.kickBody(b.bullet.kickBody);
       a.damageLama(b.bullet.damage);
     }

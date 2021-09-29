@@ -1,10 +1,8 @@
 import 'dart:ui';
 
-import 'package:flame/anchor.dart';
-import 'package:flame/components/position_component.dart';
-import 'package:flame/components/sprite_animation_component.dart';
-import 'package:flame/components/sprite_component.dart';
-import 'package:flame/spritesheet.dart';
+import 'package:flame/components.dart';
+import 'package:flame/palette.dart';
+import 'package:flame/sprite.dart';
 import 'package:flame_forge2d/body_component.dart';
 import 'package:forge2d/forge2d.dart';
 
@@ -14,7 +12,7 @@ import 'package:forge2d/forge2d.dart';
 /// static sprite with [stopAnimation] to display rest state if need.
 abstract class SpriteAnimationBodyComponent extends BodyComponent {
   /// Child component that draws ui. It's a [SpriteComponent] or [SpriteAnimationComponent].
-  PositionComponent spriteComponent;
+  PositionComponent? spriteComponent;
 
   /// Sprite sheet which uses to display image
   SpriteSheet sheet;
@@ -28,7 +26,7 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   @override
   bool debugMode = false;
 
-  Paint overridePaint;
+  Paint? overridePaint;
 
   /// Make sure that the [size] of the sprite matches the bounding shape of the
   /// body that is create in createBody().
@@ -41,7 +39,7 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   /// or
   /// SpriteAnimationBodyComponent(sheet, size)..startAnimation(0, duration);
   /// '''dart
-  SpriteAnimationBodyComponent(this.sheet, this.size, {Anchor anchor}) {
+  SpriteAnimationBodyComponent(this.sheet, this.size, {Anchor? anchor}) {
     if (anchor != null) this.anchor = anchor;
   }
 
@@ -57,10 +55,10 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     this.size,
     int startAnimRow,
     Duration stepTime, {
-    Anchor anchor,
+    Anchor? anchor,
     bool loop = true,
     bool removeOnFinish = false,
-    Function completeCallback,
+    Function? completeCallback,
   }) {
     if (anchor != null) this.anchor = anchor;
     startAnimation(
@@ -79,8 +77,13 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   /// '''
   /// SpriteAnimationBodyComponent(sheet, size)..stopAnimation(0, 0);
   /// '''dart
-  SpriteAnimationBodyComponent.rest(this.sheet, this.size,
-      {int row = 0, int column = 0, Anchor anchor}) {
+  SpriteAnimationBodyComponent.rest(
+    this.sheet,
+    this.size, {
+    int row = 0,
+    int column = 0,
+    Anchor? anchor,
+  }) {
     if (anchor != null) this.anchor = anchor;
     stopAnimation(row, column);
   }
@@ -97,13 +100,13 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     final screenPosition = viewport.getWorldToScreen(body.position);
 
     if (spriteComponent == null) return;
-    spriteComponent
+    spriteComponent!
       ..angle = -body.getAngle()
       ..size = size * viewport.scale
       ..x = screenPosition.x
       ..y = screenPosition.y;
 
-    spriteComponent.render(c);
+    spriteComponent!.render(c);
   }
 
   /// Start animation with removing old component and run sprite animation.
@@ -128,7 +131,7 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     Duration stepTime, {
     bool loop = true,
     bool removeOnFinish = false,
-    Function completeCallback,
+    Function? completeCallback,
   }) {
     spriteComponent?.remove();
 
@@ -141,10 +144,13 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
       a.onComplete = () => completeCallback();
     }
 
-    spriteComponent =
-        SpriteAnimationComponent(size, a, removeOnFinish: removeOnFinish)
-          ..anchor = anchor
-          ..overridePaint = overridePaint;
+    spriteComponent = SpriteAnimationComponent(
+      size: size,
+      animation: a,
+      removeOnFinish: removeOnFinish,
+    )
+      ..anchor = anchor
+      ..paint = overridePaint ?? BasicPalette.white.paint();
   }
 
   /// Stop animation with removing old component and set up simple sprite that
@@ -153,18 +159,18 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   void stopAnimation([int row = 0, int column = 0]) {
     spriteComponent?.remove();
     spriteComponent =
-        SpriteComponent.fromSprite(size, sheet.getSprite(row, column))
+        SpriteComponent(size: size, sprite: sheet.getSprite(row, column))
           ..anchor = anchor
-          ..overridePaint = overridePaint;
+          ..paint = overridePaint ?? BasicPalette.white.paint();
   }
 
   void setOverridePaint(Paint paint) {
     this.overridePaint = paint;
     if (spriteComponent == null) return;
     if (spriteComponent is SpriteComponent) {
-      (spriteComponent as SpriteComponent).overridePaint = paint;
+      (spriteComponent as SpriteComponent).paint = paint;
     } else {
-      (spriteComponent as SpriteAnimationComponent).overridePaint = paint;
+      (spriteComponent as SpriteAnimationComponent).paint = paint;
     }
   }
 }

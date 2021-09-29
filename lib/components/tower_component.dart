@@ -1,4 +1,4 @@
-import 'package:flame/spritesheet.dart';
+import 'package:flame/sprite.dart';
 import 'package:forge2d/forge2d.dart';
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -21,16 +21,15 @@ class TowerComponent extends SpriteAnimationBodyComponent {
       Vector2(size.x, -size.y) / 2,
       Vector2(-size.x, -size.y) / 2,
     ];
-    shape.set(vertices, vertices.length);
-    final fixtureDef = FixtureDef()
+    shape.set(vertices);
+    final fixtureDef = FixtureDef(shape)
       ..userData = this
-      ..friction = 0.0
-      ..shape = shape;
+      ..friction = 0.0;
     fixtureDef.filter.groupIndex = -2;
 
     final bodyDef = BodyDef()
       ..userData = this
-      ..type = BodyType.STATIC
+      ..type = BodyType.static
       ..position = startPosition;
 
     return world.createBody(bodyDef)..createFixture(fixtureDef);

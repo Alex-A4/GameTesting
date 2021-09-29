@@ -6,8 +6,8 @@ import 'game/game.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Flame.util.setLandscape();
-  await Flame.util.fullScreen();
+  await Flame.device.setLandscape();
+  await Flame.device.fullScreen();
   runApp(GameWidget(
     game: LamaGame(),
     backgroundBuilder: (_) => Container(color: Colors.white),

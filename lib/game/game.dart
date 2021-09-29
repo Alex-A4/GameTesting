@@ -1,7 +1,5 @@
-import 'package:flame/extensions/vector2.dart';
-import 'package:flame/gestures.dart';
+import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame/spritesheet.dart';
 import 'package:flame/timer.dart';
 import 'package:flame_forge2d/forge2d_game.dart';
 import 'package:flutter/widgets.dart';
@@ -22,19 +20,19 @@ class LamaGame extends Forge2DGame with PanDetector {
   int totalLamaCount = 0;
 
   /// Timers that displays lama and bullet cooldown
-  Timer lamaCooldown;
-  Timer bulletCooldown;
+  late Timer lamaCooldown;
+  late Timer bulletCooldown;
 
-  TowerHealthComponent towerHealth;
-  TowerComponent towerComponent;
+  late TowerHealthComponent towerHealth;
+  late TowerComponent towerComponent;
 
-  double groundY;
+  late double groundY;
 
   LamaGame({
     this.lamaSpam = const Duration(milliseconds: 1000),
     this.bulletSpam = const Duration(milliseconds: 100),
     this.maxLamaCount = 5,
-  }) : super(gravity: Vector2(.0, -50.0), scale: 2.0) {
+  }) : super(gravity: Vector2(.0, -50.0), zoom: 2.0) {
     addContactCallback(LamaBulletContact());
     addContactCallback(LamaTowerContact());
   }

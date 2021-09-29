@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:flame/extensions/vector2.dart';
-import 'package:flame/spritesheet.dart';
+import 'package:flame/extensions.dart';
+import 'package:flame/sprite.dart';
 import 'package:flame/timer.dart';
 import 'package:forge2d/forge2d.dart' hide Timer;
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
@@ -14,7 +14,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   final Vector2 startPosition;
   final Lama lama;
 
-  Timer attackTimer;
+  late Timer attackTimer;
 
   bool isJumping = false;
 
@@ -23,11 +23,11 @@ class LamaComponent extends SpriteAnimationBodyComponent {
 
   /// Blink time in seconds and blink direction.
   /// True - from fully opaque to transparent, false - otherwise
-  double blinkTime;
+  double? blinkTime;
   bool blinkDirection = true;
 
   static final zero = Vector2.zero();
-  double health;
+  late double health;
 
   /// Direction of jumping: 1 - right, -1 - left
   int jumpDirection = -1;
@@ -35,8 +35,8 @@ class LamaComponent extends SpriteAnimationBodyComponent {
   LamaComponent(
     SpriteSheet sheet,
     this.startPosition, {
-    Lama lama,
-    Vector2 sheetSize,
+    Lama? lama,
+    Vector2? sheetSize,
   })  : this.lama = lama ?? Lama.simple(),
         super.rest(sheet, sheetSize ?? Vector2(24, 36)) {
     attackTimer = Timer(
@@ -56,11 +56,10 @@ class LamaComponent extends SpriteAnimationBodyComponent {
       Vector2(size.x, -size.y) / 2,
       Vector2(-size.x, -size.y) / 2,
     ];
-    shape.set(vertices, vertices.length);
+    shape.set(vertices);
 
-    final fix = FixtureDef()
+    final fix = FixtureDef(shape)
       ..userData = this
-      ..shape = shape
       ..restitution = 0.0
       ..density = 0.0
       ..friction = 1.0;
@@ -69,7 +68,7 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     final def = BodyDef()
       ..userData = this
       ..position = startPosition
-      ..type = BodyType.DYNAMIC;
+      ..type = BodyType.dynamic;
     return world.createBody(def)
       ..createFixture(fix)
       ..setMassData(MassData()..mass = 0.8);
@@ -88,14 +87,14 @@ class LamaComponent extends SpriteAnimationBodyComponent {
           body.destroyFixture(body.fixtures.first);
         }
         body.setTransform(body.position, -1 * jumpDirection * math.pi / 2);
-        body.setType(BodyType.KINEMATIC);
+        body.setType(BodyType.kinematic);
         blinkTime = 3.0;
       }
     }
 
-    if (blinkTime != null && blinkTime > 0.0) {
+    if (blinkTime != null && blinkTime! > 0.0) {
       setBlink(dt);
-    } else if (blinkTime != null && blinkTime <= 0.0) {
+    } else if (blinkTime != null && blinkTime! <= 0.0) {
       gameRef.remove(this);
     }
 
@@ -173,15 +172,15 @@ class LamaComponent extends SpriteAnimationBodyComponent {
 
   /// Set up sprite's blink effect
   void setBlink(double dt) {
-    final diff = blinkTime - blinkTime.toInt();
+    final diff = blinkTime! - blinkTime!.toInt();
 
     final opacity = (blinkDirection ? diff : 1.0 - diff) * 0.5;
     setOverridePaint(Paint()..color = Color.fromRGBO(255, 255, 255, opacity));
     if (diff < 0.01) {
       blinkDirection = !blinkDirection;
-      blinkTime = blinkTime.toInt().toDouble();
+      blinkTime = blinkTime!.toInt().toDouble();
     }
-    blinkTime -= dt;
+    blinkTime = blinkTime! - dt;
   }
 
   /// Implement attack to damage tower

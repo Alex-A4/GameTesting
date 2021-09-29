@@ -1,11 +1,10 @@
-import 'package:flame/extensions/vector2.dart';
+import 'package:flame/game.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame_forge2d/sprite_body_component.dart';
 import 'package:forge2d/forge2d.dart';
-import 'package:flame_forge2d/viewport.dart';
 
 List<Ground> createBoundaries(Viewport viewport, Sprite sprite) {
-  final size = viewport.size / viewport.scale;
+  final size = (viewport.canvasSize ?? 0) / viewport.scale;
   final y = (-size.y / 2) + (sprite.srcSize.y / 2);
   double totalWidth = size.x / 2;
   final list = <Ground>[];
@@ -32,17 +31,16 @@ class Ground extends SpriteBodyComponent {
       Vector2(-size.x, -size.y) / 2,
     ];
 
-    shape.set(vertices, vertices.length);
+    shape.set(vertices);
 
-    final def = FixtureDef()
-      ..shape = shape
+    final def = FixtureDef(shape)
       ..restitution = 0.0
       ..friction = 1.0;
     def.filter.groupIndex = -2;
     final bodyDef = BodyDef()
       ..userData = this // To be able to determine object in collision
       ..position = start
-      ..type = BodyType.STATIC;
+      ..type = BodyType.static;
 
     return world.createBody(bodyDef)..createFixture(def);
   }
