@@ -27,6 +27,7 @@ class LamaGame extends Forge2DGame with PanDetector {
   late TowerComponent towerComponent;
 
   late double groundY;
+  late Sprite bulletSprite;
 
   LamaGame({
     this.lamaSpam = const Duration(milliseconds: 1000),
@@ -39,61 +40,67 @@ class LamaGame extends Forge2DGame with PanDetector {
 
   @override
   Future<void> onLoad() async {
+    await super.onLoad();
     await images.load('lama.png');
     await images.load('bullet.png');
     await images.load('ground.png');
     await images.load('tower.png');
+    bulletSprite = Sprite(images.fromCache('bullet.png'));
     addAll(createBoundaries(
-      viewport,
+      size,
       Sprite(images.fromCache('ground.png'), srcSize: Vector2(32, 8)),
     ));
-    towerHealth = TowerHealthComponent(100, Vector2(5, 10), viewport.width);
+
+    towerHealth = TowerHealthComponent(
+      100,
+      Vector2(5, 5),
+      size.x,
+      camera.zoom,
+    );
     add(towerHealth);
 
-    final size = viewport.size / viewport.scale;
     groundY = (-size.y / 2) + 20;
     towerComponent = TowerComponent(
       SpriteSheet(
         image: images.fromCache('tower.png'),
         srcSize: Vector2(32, 32),
       ),
-      Vector2(-size.x / 2 + 16, groundY + 4),
+      screenToWorld(Vector2(32, size.y - 40)),
     );
     add(towerComponent);
 
-    lamaCooldown = Timer(
-      lamaSpam.inMilliseconds / Duration.millisecondsPerSecond,
-      callback: () {
-        if (totalLamaCount < maxLamaCount) {
-          final size = viewport.size / viewport.scale;
-          totalLamaCount++;
-          if (totalLamaCount > maxLamaCount ~/ 2) {
-            add(LamaComponent(
-              SpriteSheet(
-                image: images.fromCache('lama.png'),
-                srcSize: Vector2(24, 36),
-              ),
-              Vector2(size.x / 2 - 20, groundY),
-              lama: Lama(10, Duration(seconds: 2), 200, 2),
-              sheetSize: Vector2(36, 54),
-            ));
-          } else
-            add(
-              LamaComponent(
-                SpriteSheet(
-                  image: images.fromCache('lama.png'),
-                  srcSize: Vector2(24, 36),
-                ),
-                Vector2(size.x / 2 - 20, groundY),
-              ),
-            );
-        }
-      },
-      repeat: true,
-    );
+    // lamaCooldown = Timer(
+    //   lamaSpam.inMilliseconds / Duration.millisecondsPerSecond,
+    //   callback: () {
+    //     if (totalLamaCount < maxLamaCount) {
+    //       totalLamaCount++;
+    //       if (totalLamaCount > maxLamaCount ~/ 2) {
+    //         add(LamaComponent(
+    //           SpriteSheet(
+    //             image: images.fromCache('lama.png'),
+    //             srcSize: Vector2(24, 36),
+    //           ),
+    //           Vector2(size.x / 2 - 20, groundY),
+    //           lama: Lama(10, Duration(seconds: 2), 200, 2),
+    //           sheetSize: Vector2(36, 54),
+    //         ));
+    //       } else
+    //         add(
+    //           LamaComponent(
+    //             SpriteSheet(
+    //               image: images.fromCache('lama.png'),
+    //               srcSize: Vector2(24, 36),
+    //             ),
+    //             Vector2(size.x / 2 - 20, groundY),
+    //           ),
+    //         );
+    //     }
+    //   },
+    //   repeat: true,
+    // );
     bulletCooldown =
         Timer(bulletSpam.inMilliseconds / Duration.millisecondsPerSecond);
-    lamaCooldown.start();
+    // lamaCooldown.start();
   }
 
   void damageTower(double damage) => towerHealth.damageTower(damage);
@@ -101,31 +108,30 @@ class LamaGame extends Forge2DGame with PanDetector {
   @override
   void update(double dt) {
     super.update(dt);
-    lamaCooldown.update(dt);
+    // lamaCooldown.update(dt);
     if (bulletCooldown.isRunning()) {
       bulletCooldown.update(dt);
     }
   }
 
   @override
-  void onPanUpdate(DragUpdateDetails details) {
-    spamBullet(details.localPosition);
+  void onPanUpdate(DragUpdateInfo details) {
+    print(hasLayout);
+    spamBullet(details.raw.localPosition);
   }
 
   @override
-  void onPanStart(DragStartDetails details) {
-    spamBullet(details.localPosition);
+  void onPanStart(DragStartInfo details) {
+    print(hasLayout);
+    spamBullet(details.raw.localPosition);
   }
 
   void spamBullet(Offset position) {
     if (!bulletCooldown.isRunning()) {
-      final bullet = BulletComponent(
-        Sprite(images.fromCache('bullet.png')),
-        position.dy,
-        bullet: Bullet.simple(),
-      );
-      towerComponent.shoot();
+      final bullet = BulletComponent(bulletSprite, position.dy);
+      print(hasLayout);
       add(bullet);
+      towerComponent.shoot();
       bulletCooldown.start();
     }
   }

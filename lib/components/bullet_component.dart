@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_forge2d/sprite_body_component.dart';
@@ -36,10 +37,10 @@ class BulletComponent extends SpriteBodyComponent {
 
     final def = BodyDef()
       ..userData = this
-      ..position = viewport.getScreenToWorld(Vector2(40, startY))
+      ..position = gameRef.screenToWorld(Vector2(40, startY))
       ..type = BodyType.dynamic;
     this.startY = def.position.y;
-    final s = viewport.size / viewport.scale;
+    final s = camera.gameSize;
     rect = Rect.fromLTWH(-s.x / 2, -s.y / 2, s.x, s.y);
     return world.createBody(def)
       ..createFixture(fixDef)
@@ -52,15 +53,17 @@ class BulletComponent extends SpriteBodyComponent {
 
     /// Remove bullet if it contacts with lama, if called [markToRemove]
     if (needRemove) {
-      gameRef.remove(this);
+      removeFromParent();
       needRemove = false;
     } else {
       final pos = this.body.position;
       body.setTransform(Vector2(pos.x + bullet.speed * dt, startY), 0);
 
       /// If the bullet go out of the screen
+      print(rect);
+      print(pos);
       if (!rect.contains(pos.toOffset())) {
-        gameRef.remove(this);
+        removeFromParent();
       }
     }
   }

@@ -112,8 +112,8 @@ class LamaComponent extends SpriteAnimationBodyComponent {
     super.render(c);
     if (isDead) return;
 
-    final padding = Vector2(3 * viewport.scale, 0);
-    final origSize = size * viewport.scale - (padding * 2);
+    final padding = Vector2(3 * camera.zoom, 0);
+    final origSize = size * camera.zoom - (padding * 2);
 
     final healthPaint = Paint()
       ..color = Color(0xFF00AF00)

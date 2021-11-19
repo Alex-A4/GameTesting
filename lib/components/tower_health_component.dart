@@ -10,16 +10,24 @@ class TowerHealthComponent extends TextComponent {
   late Vector2 boxSize;
   late double currentHealth;
 
-  TowerHealthComponent(this.maxHealth, this.startPosition, double width)
-      : super(
+  TowerHealthComponent(
+    this.maxHealth,
+    this.startPosition,
+    double width,
+    double zoom,
+  ) : super(
           maxHealth.toStringAsFixed(1),
           textRenderer: TextPaint(
-            config: TextPaintConfig(fontSize: 18, color: Color(0xFFFFFFFF)),
+            config: TextPaintConfig(
+              fontSize: 18 / zoom,
+              color: Color(0xFFFFFFFF),
+            ),
           ),
         ) {
-    position = startPosition + Vector2(width / 2, 10);
+    final realWidth = width - 2 * startPosition.x;
+    position = startPosition + Vector2(realWidth / 2, 10 / zoom + 1);
     anchor = Anchor.center;
-    boxSize = Vector2(width, 20);
+    boxSize = Vector2(realWidth, 20 / zoom);
     currentHealth = maxHealth;
   }
 

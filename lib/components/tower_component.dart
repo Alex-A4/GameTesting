@@ -39,7 +39,11 @@ class TowerComponent extends SpriteAnimationBodyComponent {
   void shoot() {
     if (isShooting) return;
     isShooting = true;
-    startAnimation(0, Duration(milliseconds: 30),
-        loop: false, completeCallback: () => isShooting = false);
+    startAnimation(
+      0,
+      Duration(milliseconds: 30),
+      loop: false,
+      completeCallback: () => isShooting = false,
+    );
   }
 }

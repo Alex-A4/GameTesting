@@ -11,8 +11,8 @@ import 'package:forge2d/forge2d.dart';
 /// You can use animations with [startAnimation] method or you can set up
 /// static sprite with [stopAnimation] to display rest state if need.
 abstract class SpriteAnimationBodyComponent extends BodyComponent {
-  /// Child component that draws ui. It's a [SpriteComponent] or [SpriteAnimationComponent].
-  PositionComponent? spriteComponent;
+  /// Child component that draws ui. It's a [_spriteComponent] or [SpriteAnimationComponent].
+  PositionComponent? _spriteComponent;
 
   /// Sprite sheet which uses to display image
   SpriteSheet sheet;
@@ -27,21 +27,6 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   bool debugMode = false;
 
   Paint? overridePaint;
-
-  /// Make sure that the [size] of the sprite matches the bounding shape of the
-  /// body that is create in createBody().
-  ///
-  /// If you use default constructor, don't forget to call [startAnimation] or
-  /// [stopAnimation] to set up the sprite and component, otherwise you will not
-  /// see anything.
-  /// '''
-  /// SpriteAnimationBodyComponent(sheet, size)..stopAnimation(0, 0);
-  /// or
-  /// SpriteAnimationBodyComponent(sheet, size)..startAnimation(0, duration);
-  /// '''dart
-  SpriteAnimationBodyComponent(this.sheet, this.size, {Anchor? anchor}) {
-    if (anchor != null) this.anchor = anchor;
-  }
 
   /// Create component with animation at the start.
   /// Animation specified with [startAnimRow] of sprite and [stepTime].
@@ -90,23 +75,22 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
 
   @override
   void update(double dt) {
+    _spriteComponent?.update(dt);
     super.update(dt);
-    spriteComponent?.update(dt);
   }
 
   @override
   void render(Canvas c) {
+    if (_spriteComponent != null) {
+      final screenPosition = gameRef.worldToScreen(body.position.clone());
+      _spriteComponent!
+        ..angle = -body.angle
+        ..size = size * camera.zoom
+        ..position = screenPosition;
+
+      _spriteComponent!.render(c);
+    }
     super.render(c);
-    final screenPosition = viewport.getWorldToScreen(body.position);
-
-    if (spriteComponent == null) return;
-    spriteComponent!
-      ..angle = -body.getAngle()
-      ..size = size * viewport.scale
-      ..x = screenPosition.x
-      ..y = screenPosition.y;
-
-    spriteComponent!.render(c);
   }
 
   /// Start animation with removing old component and run sprite animation.
@@ -133,8 +117,6 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     bool removeOnFinish = false,
     Function? completeCallback,
   }) {
-    spriteComponent?.remove();
-
     final a = sheet.createAnimation(
       row: row,
       stepTime: stepTime.inMilliseconds / Duration.millisecondsPerSecond,
@@ -144,7 +126,7 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
       a.onComplete = () => completeCallback();
     }
 
-    spriteComponent = SpriteAnimationComponent(
+    _spriteComponent = SpriteAnimationComponent(
       size: size,
       animation: a,
       removeOnFinish: removeOnFinish,
@@ -157,8 +139,7 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
   /// specified with [row] and  [column].
   /// After call this method, sprite will display simple sprite with rest state.
   void stopAnimation([int row = 0, int column = 0]) {
-    spriteComponent?.remove();
-    spriteComponent =
+    _spriteComponent =
         SpriteComponent(size: size, sprite: sheet.getSprite(row, column))
           ..anchor = anchor
           ..paint = overridePaint ?? BasicPalette.white.paint();
@@ -166,11 +147,11 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
 
   void setOverridePaint(Paint paint) {
     this.overridePaint = paint;
-    if (spriteComponent == null) return;
-    if (spriteComponent is SpriteComponent) {
-      (spriteComponent as SpriteComponent).paint = paint;
+    if (_spriteComponent == null) return;
+    if (_spriteComponent is SpriteComponent) {
+      (_spriteComponent as SpriteComponent).paint = paint;
     } else {
-      (spriteComponent as SpriteAnimationComponent).paint = paint;
+      (_spriteComponent as SpriteAnimationComponent).paint = paint;
     }
   }
 }
