@@ -1,24 +1,36 @@
 import 'package:flame/game.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame_forge2d/sprite_body_component.dart';
+import 'package:flutter/material.dart' hide Viewport;
 import 'package:forge2d/forge2d.dart';
+import 'package:game_testing/base_components/sprite_anim_body_component.dart';
 
-List<Ground> createBoundaries(Vector2 gameSize, Sprite sprite) {
-  final y = (-gameSize.y) + (sprite.srcSize.y / 2);
-  double totalWidth = gameSize.x;
+/// Create ground for whole width of screen at the bottom of it
+List<Ground> createBoundaries(Vector2 gameSize, SpriteSheet sprite, Viewport centeredViewport) {
+  final y = -gameSize.y + (sprite.srcSize.y / 2);
+  double x = sprite.image.width / 2;
+
+  int totalCount = (gameSize.x / sprite.image.width).ceil();
   final list = <Ground>[];
-  while (totalWidth >= 0) {
-    list.add(Ground(Vector2(totalWidth, y), sprite));
-    totalWidth -= (sprite.image.width);
+
+  for (var i = 0; i < totalCount; i++) {
+    list.add(Ground(centeredViewport.unprojectVector(Vector2(x, y)), sprite));
+    x += (sprite.image.width);
   }
 
   return list;
 }
 
-class Ground extends SpriteBodyComponent {
+/// The ground where objects stays on
+class Ground extends SpriteAnimationBodyComponent {
   final Vector2 start;
 
-  Ground(this.start, Sprite sprite) : super(sprite, Vector2(32, 8));
+  Ground(this.start, SpriteSheet sprite) : super.rest(sprite, Vector2(32, 8));
+
+  @override
+  Paint get paint => Paint()
+    ..color = Colors.red
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1;
 
   @override
   Body createBody() {

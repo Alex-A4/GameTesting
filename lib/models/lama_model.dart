@@ -7,5 +7,5 @@ class Lama {
 
   Lama(this.damage, this.attackCooldown, this.health, this.jumpPower);
 
-  factory Lama.simple() => Lama(5.0, Duration(seconds: 1), 100, 1);
+  factory Lama.simple() => Lama(5.0, const Duration(seconds: 1), 100, 1);
 }

@@ -1,7 +1,6 @@
 import 'package:flame/sprite.dart';
 import 'package:forge2d/forge2d.dart';
 import 'package:game_testing/base_components/sprite_anim_body_component.dart';
-import 'package:vector_math/vector_math_64.dart';
 
 /// Component that describe tower which will be attacked by lamas
 class TowerComponent extends SpriteAnimationBodyComponent {
@@ -9,8 +8,7 @@ class TowerComponent extends SpriteAnimationBodyComponent {
 
   bool isShooting = false;
 
-  TowerComponent(SpriteSheet s, this.startPosition)
-      : super.rest(s, Vector2(32, 32));
+  TowerComponent(SpriteSheet s, this.startPosition) : super.rest(s, Vector2(32, 32));
 
   @override
   Body createBody() {
@@ -41,7 +39,7 @@ class TowerComponent extends SpriteAnimationBodyComponent {
     isShooting = true;
     startAnimation(
       0,
-      Duration(milliseconds: 30),
+      const Duration(milliseconds: 30),
       loop: false,
       completeCallback: () => isShooting = false,
     );

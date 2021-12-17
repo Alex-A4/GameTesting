@@ -1,9 +1,9 @@
 name: game_testing
 description: Project to test game plugins and approaches
 
-publish_to: 'none'
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 0.0.1
+version: 1.0.0+1
 
 environment:
   sdk: ">=2.13.0 <3.0.0"
@@ -12,17 +12,14 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.3
-  flame:
-    path: ../flame/packages/flame/
-  flame_forge2d:
-    path: ../flame/packages/flame_forge2d/
+  cupertino_icons: ^1.0.4
+  flame: ^1.0.0
+  flame_forge2d: ^0.8.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
+  flutter_lints: ^1.0.4
 
 flutter:
   uses-material-design: true

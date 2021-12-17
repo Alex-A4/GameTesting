@@ -1,16 +1,24 @@
-import 'dart:ui';
-
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame_forge2d/body_component.dart';
-import 'package:forge2d/forge2d.dart';
+import 'package:flutter/material.dart';
+import 'package:game_testing/game/game.dart';
 
 /// Abstraction of body component to use it with Forge2D with animated sprite.
 /// Looks like [SpriteBodyComponent] but with SpriteAnimationComponent inside.
 /// You can use animations with [startAnimation] method or you can set up
 /// static sprite with [stopAnimation] to display rest state if need.
 abstract class SpriteAnimationBodyComponent extends BodyComponent {
+  @override
+  bool get debugMode => (gameRef as LamaGame).debugMode;
+
+  @override
+  Paint get paint => Paint()
+    ..color = Colors.red
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1;
+
   /// Child component that draws ui. It's a [_spriteComponent] or [SpriteAnimationComponent].
   PositionComponent? _spriteComponent;
 
@@ -22,9 +30,6 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
 
   /// Anchor point for this component. This is where flame "grabs it".
   Anchor anchor = Anchor.center;
-
-  @override
-  bool debugMode = false;
 
   Paint? overridePaint;
 
@@ -73,26 +78,6 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     stopAnimation(row, column);
   }
 
-  @override
-  void update(double dt) {
-    _spriteComponent?.update(dt);
-    super.update(dt);
-  }
-
-  @override
-  void render(Canvas c) {
-    if (_spriteComponent != null) {
-      final screenPosition = gameRef.worldToScreen(body.position.clone());
-      _spriteComponent!
-        ..angle = -body.angle
-        ..size = size * camera.zoom
-        ..position = screenPosition;
-
-      _spriteComponent!.render(c);
-    }
-    super.render(c);
-  }
-
   /// Start animation with removing old component and run sprite animation.
   /// [row] is the row of sprite which should be animated.
   /// [stepTime] is time between two frames.
@@ -117,6 +102,7 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     bool removeOnFinish = false,
     Function? completeCallback,
   }) {
+    _spriteComponent?.removeFromParent();
     final a = sheet.createAnimation(
       row: row,
       stepTime: stepTime.inMilliseconds / Duration.millisecondsPerSecond,
@@ -133,20 +119,22 @@ abstract class SpriteAnimationBodyComponent extends BodyComponent {
     )
       ..anchor = anchor
       ..paint = overridePaint ?? BasicPalette.white.paint();
+    add(_spriteComponent!);
   }
 
   /// Stop animation with removing old component and set up simple sprite that
   /// specified with [row] and  [column].
   /// After call this method, sprite will display simple sprite with rest state.
   void stopAnimation([int row = 0, int column = 0]) {
-    _spriteComponent =
-        SpriteComponent(size: size, sprite: sheet.getSprite(row, column))
-          ..anchor = anchor
-          ..paint = overridePaint ?? BasicPalette.white.paint();
+    _spriteComponent?.removeFromParent();
+    _spriteComponent = SpriteComponent(size: size, sprite: sheet.getSprite(row, column))
+      ..anchor = anchor
+      ..paint = overridePaint ?? BasicPalette.white.paint();
+    add(_spriteComponent!);
   }
 
   void setOverridePaint(Paint paint) {
-    this.overridePaint = paint;
+    overridePaint = paint;
     if (_spriteComponent == null) return;
     if (_spriteComponent is SpriteComponent) {
       (_spriteComponent as SpriteComponent).paint = paint;

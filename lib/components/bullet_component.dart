@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -9,13 +7,14 @@ import 'package:game_testing/models/bullet_model.dart';
 
 /// The component of bullet
 class BulletComponent extends SpriteBodyComponent {
-  final Bullet bullet;
-  late Rect rect;
-  late double startY;
-  bool needRemove = false;
+  final Bullet _bullet;
+  Bullet get bullet => _bullet;
+  late Rect _rect;
+  late double _startY;
+  bool _needRemove = false;
 
-  BulletComponent(Sprite sprite, this.startY, {Bullet? bullet})
-      : this.bullet = bullet ?? Bullet.simple(),
+  BulletComponent(Sprite sprite, this._startY, {Bullet? bullet})
+      : _bullet = bullet ?? Bullet.simple(),
         super(sprite, Vector2(11, 5));
 
   @override
@@ -35,13 +34,13 @@ class BulletComponent extends SpriteBodyComponent {
       ..friction = 0.0;
     fixDef.filter.groupIndex = -2;
 
+    final s = camera.gameSize;
     final def = BodyDef()
       ..userData = this
-      ..position = gameRef.screenToWorld(Vector2(40, startY))
+      ..position = Vector2(10, _startY)
       ..type = BodyType.dynamic;
-    this.startY = def.position.y;
-    final s = camera.gameSize;
-    rect = Rect.fromLTWH(-s.x / 2, -s.y / 2, s.x, s.y);
+    _startY = def.position.y;
+    _rect = Rect.fromLTWH(0, 0, s.x, s.y);
     return world.createBody(def)
       ..createFixture(fixDef)
       ..setMassData(MassData()..mass = 0.01);
@@ -52,23 +51,22 @@ class BulletComponent extends SpriteBodyComponent {
     super.update(dt);
 
     /// Remove bullet if it contacts with lama, if called [markToRemove]
-    if (needRemove) {
+    if (_needRemove) {
       removeFromParent();
-      needRemove = false;
+      _needRemove = false;
     } else {
-      final pos = this.body.position;
-      body.setTransform(Vector2(pos.x + bullet.speed * dt, startY), 0);
+      final pos = body.position.clone();
+      body.setTransform(Vector2(pos.x + _bullet.speed * dt, _startY), 0);
 
       /// If the bullet go out of the screen
-      print(rect);
-      print(pos);
-      if (!rect.contains(pos.toOffset())) {
+      pos.absolute();
+      if (!_rect.contains(pos.toOffset())) {
         removeFromParent();
       }
     }
   }
 
   void markToRemove() {
-    needRemove = true;
+    _needRemove = true;
   }
 }
